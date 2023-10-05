@@ -55,8 +55,11 @@ public class Main
         System.out.print("Enter article number:\n");
         int choice = in.nextInt();
 
-        JsonObject id = res_fromJson.get(choice).getAsJsonObject();
+        JsonObject id = res_fromJson.get(choice - 1).getAsJsonObject();
         String pageid = id.get("pageid").getAsString();
+
+        String wiki_url = "https://ru.wikipedia.org/w/index.php?curid=" + pageid;
+        System.out.println("URL:" + wiki_url);
 
         writer_res.close();
         in.close();
