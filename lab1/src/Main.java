@@ -10,21 +10,20 @@ import com.google.gson.JsonArray;
 
 public class Main
 {
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) throws IOException {
         System.out.print("Enter word:\n");
         Scanner in = new Scanner(System.in);
         String request = in.nextLine();
 
         //Search and request to the server
         SearchEngine engine = new SearchEngine();
-        String result = engine.WikiSearch(request);
-        System.out.printf(result);
+        String result_json = engine.WikiSearch(request);
+        System.out.printf(result_json);
 
         //Write to a file
         try(FileWriter writer = new FileWriter("result.json", false))
         {
-            writer.write(result);
+            writer.write(result_json);
             writer.close();
         } catch (IOException ex)
         {
@@ -33,24 +32,33 @@ public class Main
         System.out.println("\n");
 
         //Parsing
-        /*GsonBuilder builder = new GsonBuilder();
+        GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
-        JsonObject res_fromJson = gson.fromJson(result, JsonObject.class);
-        JsonObject query = res_fromJson.getAsJsonObject("query");
-        JsonArray searchResults = query.getAsJsonArray("search");
-        String title = null;
 
-        FileWriter writer_res = new FileWriter("result_after.json");
-        for (int i = 0; i < searchResults.size(); i++) {
-            JsonObject result1 = searchResults.get(i).getAsJsonObject();
-            title = result1.get("title").getAsString();
+        JsonObject fromjs = gson.fromJson(result_json, JsonObject.class);
+        JsonObject query = fromjs.getAsJsonObject("query");
+        JsonArray res_fromJson = query.getAsJsonArray("search");
+
+        String title = null;
+        FileWriter writer_res = new FileWriter("titles.json");
+        int i;
+
+        //Titles output
+        for (i = 0; i < res_fromJson.size(); i++)
+        {
+            JsonObject titles = res_fromJson.get(i).getAsJsonObject();
+            title = titles.get("title").getAsString();
             System.out.println((i + 1) + ". " + title);
-                writer_res.write(title);
-                writer_res.append('\n');
+            writer_res.write((i + 1) + ". " + title + '\n');
         }
 
-        writer_res.close();*/
+        System.out.print("Enter article number:\n");
+        int choice = in.nextInt();
 
+        JsonObject id = res_fromJson.get(choice).getAsJsonObject();
+        String pageid = id.get("pageid").getAsString();
+
+        writer_res.close();
         in.close();
     }
 }
