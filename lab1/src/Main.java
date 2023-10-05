@@ -1,16 +1,17 @@
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.awt.Desktop;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Scanner;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonArray;
+import java.net.URI;
 
 public class Main
 {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, URISyntaxException {
         System.out.print("Enter word:\n");
         Scanner in = new Scanner(System.in);
         String request = in.nextLine();
@@ -55,11 +56,14 @@ public class Main
         System.out.print("Enter article number:\n");
         int choice = in.nextInt();
 
+        //Getting pageid
         JsonObject id = res_fromJson.get(choice - 1).getAsJsonObject();
         String pageid = id.get("pageid").getAsString();
 
+        //Open wiki
         String wiki_url = "https://ru.wikipedia.org/w/index.php?curid=" + pageid;
         System.out.println("URL:" + wiki_url);
+        Desktop.getDesktop().browse(new URI(wiki_url));
 
         writer_res.close();
         in.close();
