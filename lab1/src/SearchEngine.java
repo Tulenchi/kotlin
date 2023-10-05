@@ -10,9 +10,8 @@ import java.nio.charset.StandardCharsets;
 
 public class SearchEngine
 {
-    public String WikiSearch(String requestString)
-    {
-        URI uri = null;
+    public String WikiSearch(String requestString) throws IOException, InterruptedException {
+        URI uri;
         try
         {
             uri = new URI("https://ru.wikipedia.org/w/api.php?action=query&list=search&utf8=&format=json&srsearch=" + URLEncoder.encode(requestString, StandardCharsets.UTF_8));
@@ -26,16 +25,8 @@ public class SearchEngine
                 .version(HttpClient.Version.HTTP_2)
                 .build();
 
-        HttpResponse<String> response = null;
-        try
-        {
-            response = client.send(request, BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e)
-        {
-            throw new RuntimeException(e);
-        }
+        HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
 
-        System.out.println(response.statusCode());
         return response.body();
     }
 }

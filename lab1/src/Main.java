@@ -1,5 +1,4 @@
 import java.awt.Desktop;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Scanner;
@@ -8,64 +7,93 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonArray;
 import java.net.URI;
+import java.util.regex.Pattern;
 
 public class Main
 {
-    public static void main(String[] args) throws IOException, URISyntaxException {
-        System.out.print("Enter word:\n");
-        Scanner in = new Scanner(System.in);
-        String request = in.nextLine();
-
-        //Search and request to the server
-        SearchEngine engine = new SearchEngine();
-        String result_json = engine.WikiSearch(request);
-        System.out.printf(result_json);
-
-        //Write to a file
-        try(FileWriter writer = new FileWriter("result.json", false))
-        {
-            writer.write(result_json);
-            writer.close();
-        } catch (IOException ex)
-        {
-            System.out.println(ex.getMessage());
+    private static String ReadWordFromConsole(Scanner in) {
+        String request;
+        while (true) {
+            System.out.print("Enter word: ");
+            request = in.nextLine();
+            if (request.isBlank()) {
+                System.out.println("Please enter word to search\n");
+            } else break;
         }
-        System.out.println("\n");
+        return request;
+    }
 
-        //Parsing
+    public static int ReadArticleNumber(Scanner in, int max) {
+        String choice_str;
+        int choice;
+
+        while (true) {
+            System.out.print("\nEnter article number: ");
+
+            choice_str = in.nextLine().strip();
+            Pattern pattern = Pattern.compile("\\d+");
+            if (!choice_str.isBlank() && pattern.matcher(choice_str).matches()) {
+                choice = Integer.parseInt(choice_str);
+                if (0 < choice && choice <= max) break;
+            }
+            System.out.println("Please enter number from 1 to " + max);
+        }
+        return choice;
+    }
+
+    public static void main(String[] args) throws IOException, URISyntaxException, InterruptedException {
+        Scanner in = new Scanner(System.in);
+
+        // Search and send request to the server
+        SearchEngine engine = new SearchEngine();
+        String result_json;
+
+        String request;
+        while (true) {
+            try {
+                request = ReadWordFromConsole(in);
+                result_json = engine.WikiSearch(request);
+                break;
+            } catch (IOException e) {
+                System.out.println("Error: cannot connect to Wikipedia. Please check your internet connection");
+            }
+        }
+
+        System.out.println("Received json: " + result_json + "\n");
+
+        // Parsing
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
 
-        JsonObject fromjs = gson.fromJson(result_json, JsonObject.class);
-        JsonObject query = fromjs.getAsJsonObject("query");
-        JsonArray res_fromJson = query.getAsJsonArray("search");
+        JsonObject json = gson.fromJson(result_json, JsonObject.class);
+        JsonObject query = json.getAsJsonObject("query");
+        JsonArray result = query.getAsJsonArray("search");
 
-        String title = null;
-        FileWriter writer_res = new FileWriter("titles.json");
-        int i;
-
-        //Titles output
-        for (i = 0; i < res_fromJson.size(); i++)
+        if (result.isEmpty())
         {
-            JsonObject titles = res_fromJson.get(i).getAsJsonObject();
+            System.out.println("No results found");
+            System.exit(0);
+        }
+        // Titles output
+        String title;
+        for (int i = 0; i < result.size(); i++)
+        {
+            JsonObject titles = result.get(i).getAsJsonObject();
             title = titles.get("title").getAsString();
             System.out.println((i + 1) + ". " + title);
-            writer_res.write((i + 1) + ". " + title + '\n');
         }
 
-        System.out.print("Enter article number:\n");
-        int choice = in.nextInt();
+        int choice = ReadArticleNumber(in, result.size());
 
-        //Getting pageid
-        JsonObject id = res_fromJson.get(choice - 1).getAsJsonObject();
-        String pageid = id.get("pageid").getAsString();
+        // Getting pageId
+        JsonObject id = result.get(choice - 1).getAsJsonObject();
+        String pageId = id.get("pageid").getAsString();
 
-        //Open wiki
-        String wiki_url = "https://ru.wikipedia.org/w/index.php?curid=" + pageid;
+        // Open wiki
+        String wiki_url = "https://ru.wikipedia.org/w/index.php?curid=" + pageId;
         System.out.println("URL:" + wiki_url);
         Desktop.getDesktop().browse(new URI(wiki_url));
 
-        writer_res.close();
         in.close();
     }
 }
