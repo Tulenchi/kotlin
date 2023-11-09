@@ -74,6 +74,7 @@ public class Main
             System.out.println("No results found");
             System.exit(0);
         }
+
         // Titles output
         String title;
         for (int i = 0; i < result.size(); i++)
@@ -91,7 +92,7 @@ public class Main
 
         // Open wiki
         String wiki_url = "https://ru.wikipedia.org/w/index.php?curid=" + pageId;
-        System.out.println("URL:" + wiki_url);
+        System.out.println("LINK:" + wiki_url);
         Desktop.getDesktop().browse(new URI(wiki_url));
 
         in.close();
