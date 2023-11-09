@@ -1,10 +1,15 @@
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.*;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
 
 public class Main {
@@ -84,9 +89,47 @@ public class Main {
 
                 else if (containsXml)
                 {
-                    DocumentBuilderFactory dbf;
-                    DocumentBuilder        db ;
-                    Document               doc;
+                    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder db = dbf.newDocumentBuilder();
+                    Document doc = db.parse(new File(choice));
+
+                    NodeList itemList = doc.getElementsByTagName("item");
+
+                    HashMap<String, Integer> HashmapFromFileDuplicate = new HashMap<>();
+                    HashMap<String, Integer> HashmapFromFileFloor = new HashMap<>();
+
+                    long startTime = System.currentTimeMillis();
+                    for (int i = 0; i < itemList.getLength(); i++)
+                    {
+                        Element item = (Element) itemList.item(i);
+
+                        String city = item.getAttribute("city");
+                        String street = item.getAttribute("street");
+                        String house = item.getAttribute("house");
+                        String floor = item.getAttribute("floor");
+
+                        String key = city + ";" + street + ";" + house + ";" + floor;
+                        String keyFloor = city + ";" + floor;
+
+                        HashmapFromFileDuplicate.put(key, HashmapFromFileDuplicate.getOrDefault(key, 0) + 1);
+                        HashmapFromFileFloor.put(keyFloor, HashmapFromFileFloor.getOrDefault(keyFloor, 0) + 1);
+
+                    }
+                    long endTime = System.currentTimeMillis();
+
+                    for (String key : HashmapFromFileDuplicate.keySet()) {
+                        int count = HashmapFromFileDuplicate.get(key);
+                        if (count > 1)
+                            System.out.println("House: " + key + " \nNumber of duplicates: " + count + "\n");
+                    }
+
+                    for (String key : HashmapFromFileFloor.keySet()) {
+                        int count = HashmapFromFileFloor.get(key);
+                        System.out.println("House (city, floor): " + key + " \nNumber of houses with that many floors: " + count + "\n");
+                    }
+
+                    long time = endTime - startTime;
+                    System.out.println("Time in sec: " + (time * 0.001));
 
                 }
 
@@ -96,6 +139,10 @@ public class Main {
             }catch(FileNotFoundException e)
             {
                 System.out.println("Wrong file name");
+            } catch (ParserConfigurationException e) {
+                throw new RuntimeException(e);
+            } catch (SAXException e) {
+                throw new RuntimeException(e);
             }
         }
     }
