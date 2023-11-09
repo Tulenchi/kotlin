@@ -28,7 +28,7 @@ public class Main {
 
         BufferedReader reader = new BufferedReader(new FileReader(choice));
         HashMap<String, Integer> HashmapFromFileDuplicate = new HashMap<>();
-        HashMap<String, String> HashmapFromFileFloor = new HashMap<>();
+        HashMap<String, Integer> HashmapFromFileFloor = new HashMap<>();
 
         while((line = reader.readLine()) != null)
         {
@@ -38,6 +38,7 @@ public class Main {
             String house = parts[2];
             String floor = parts[3];
             String key = city + ";" + street + ";"  + house + ";"  + floor;
+            String keyFloor = city + ";" + floor;
 
             if (HashmapFromFileDuplicate.containsKey(key)) {
                 HashmapFromFileDuplicate.put(key, HashmapFromFileDuplicate.get(key) + 1);
@@ -45,8 +46,14 @@ public class Main {
                 HashmapFromFileDuplicate.put(key, 1);
             }
 
-            if(!city.equals("") && !floor.equals(""))
-                HashmapFromFileFloor.put(city, floor);
+            if (HashmapFromFileFloor.containsKey(keyFloor)) {
+                HashmapFromFileFloor.put(keyFloor, HashmapFromFileFloor.get(keyFloor) + 1);
+            } else {
+                HashmapFromFileFloor.put(keyFloor, 1);
+            }
+
+            //if(!city.equals("") && !floor.equals(""))
+            //    HashmapFromFileFloor.put(city, floor);
 
         }
 
@@ -56,6 +63,14 @@ public class Main {
             if (vl != 1) {
                 System.out.println("House: " + kl + " \nNumber of duplicates: " + vl + "\n\n");
             }
+        }
+
+        for (Map.Entry<String, Integer> entry : HashmapFromFileFloor.entrySet()) {
+            String kl1 = entry.getKey();
+            Integer vl1 = entry.getValue();
+            if (vl1 != 1)
+                System.out.println("House (city, floor): " + kl1 + " \nNumber of houses with that many floors: " + vl1 + "\n\n");
+
         }
     }
 }
