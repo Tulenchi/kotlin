@@ -27,7 +27,7 @@ public class Main {
         }
 
         BufferedReader reader = new BufferedReader(new FileReader(choice));
-        HashMap<String, Integer> HashmapFromFileDuplicate1 = new HashMap<>();
+        HashMap<String, Integer> HashmapFromFileDuplicate = new HashMap<>();
         HashMap<String, String> HashmapFromFileFloor = new HashMap<>();
 
         while((line = reader.readLine()) != null)
@@ -37,60 +37,25 @@ public class Main {
             String street = parts[1];
             String house = parts[2];
             String floor = parts[3];
-            String key = city + street + house + floor;
+            String key = city + ";" + street + ";"  + house + ";"  + floor;
 
-            if(!key.equals(""))
-                HashmapFromFileDuplicate1.put(key, 1);
+            if (HashmapFromFileDuplicate.containsKey(key)) {
+                HashmapFromFileDuplicate.put(key, HashmapFromFileDuplicate.get(key) + 1);
+            } else {
+                HashmapFromFileDuplicate.put(key, 1);
+            }
 
             if(!city.equals("") && !floor.equals(""))
                 HashmapFromFileFloor.put(city, floor);
 
         }
-        HashMap<String, Integer> HashmapFromFileDuplicate = new HashMap<>();
-        for(Map.Entry<String, Integer> entry : HashmapFromFileDuplicate.entrySet())
-        {
-            String newkey = entry.getKey();
-            Integer value = entry.getValue();
-
-            if(HashmapFromFileDuplicate.containsKey(newkey))
-            {
-                HashmapFromFileDuplicate.put(newkey, HashmapFromFileDuplicate.get(newkey) + 1);
-            }
-            else
-                HashmapFromFileDuplicate.put(newkey, 1);
-        }
 
         for (Map.Entry<String, Integer> entry : HashmapFromFileDuplicate.entrySet()) {
             String kl = entry.getKey();
             Integer vl = entry.getValue();
-            System.out.println("Ключ: " + kl + ", Количество повторений: " + vl);
+            if (vl != 1) {
+                System.out.println("House: " + kl + " \nNumber of duplicates: " + vl + "\n\n");
+            }
         }
-
-        /*String csvFile = "C:\\Users\\olya-\\OneDrive\\Рабочий стол\\программирование\\kotlin\\address.csv";
-        String line;
-        String csvSplitBy = ";";
-
-        HashMap<String, Integer> duplicatesMap = new HashMap<>();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
-            while ((line = br.readLine()) != null) {
-                String[] values = line.split(csvSplitBy);
-                String key = values[0] + values[1] + values[2] + values[3];
-
-                if (duplicatesMap.containsKey(key)) {
-                    duplicatesMap.put(key, duplicatesMap.get(key) + 1);
-                } else {
-                    duplicatesMap.put(key, 1);
-                }
-            }
-
-            for (String key : duplicatesMap.keySet()) {
-                if (duplicatesMap.get(key) > 1) {
-                    System.out.println("Повторение: " + key);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
     }
 }
