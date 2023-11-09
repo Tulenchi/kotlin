@@ -30,6 +30,7 @@ public class Main {
         HashMap<String, Integer> HashmapFromFileDuplicate = new HashMap<>();
         HashMap<String, Integer> HashmapFromFileFloor = new HashMap<>();
 
+        long startTime = System.currentTimeMillis();
         while((line = reader.readLine()) != null)
         {
             String[] parts = line.split(splitBy);
@@ -52,25 +53,25 @@ public class Main {
                 HashmapFromFileFloor.put(keyFloor, 1);
             }
 
-            //if(!city.equals("") && !floor.equals(""))
-            //    HashmapFromFileFloor.put(city, floor);
-
         }
+        long endTime = System.currentTimeMillis();
 
         for (Map.Entry<String, Integer> entry : HashmapFromFileDuplicate.entrySet()) {
             String kl = entry.getKey();
             Integer vl = entry.getValue();
             if (vl != 1) {
-                System.out.println("House: " + kl + " \nNumber of duplicates: " + vl + "\n\n");
+                System.out.println("House: " + kl + " \nNumber of duplicates: " + vl + "\n");
             }
         }
 
         for (Map.Entry<String, Integer> entry : HashmapFromFileFloor.entrySet()) {
             String kl1 = entry.getKey();
             Integer vl1 = entry.getValue();
-            if (vl1 != 1)
-                System.out.println("House (city, floor): " + kl1 + " \nNumber of houses with that many floors: " + vl1 + "\n\n");
+            System.out.println("House (city, floor): " + kl1 + " \nNumber of houses with that many floors: " + vl1 + "\n");
 
         }
+
+        long time = endTime - startTime;
+        System.out.println("Time in sec: " + (time * 0.001));
     }
 }
