@@ -160,10 +160,7 @@ public class Main
         } catch (FileNotFoundException e) {
             System.out.println("Wrong file name");
         }
-        catch (ParserConfigurationException e) {
-            throw new RuntimeException(e);
-        }
-        catch (SAXException e) {
+        catch (ParserConfigurationException | SAXException e) {
             throw new RuntimeException(e);
         }
     }
